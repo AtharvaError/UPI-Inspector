@@ -1,0 +1,323 @@
+# Golden scenarios (docs/10, section 3). Frozen situations and what they must produce.
+# Setup keys: payer, payee, known, call, msg, device, request, policy, parent, model_down, cache_down.
+# Expectations are deliberately about guarantees (rule floors and caps, maxima for honest payments),
+# so they hold across retrains.
+
+# ---------------------------------------------------------------- rules: firing and near-miss
+- id: G-R01
+  title: Payee on the denylist is declined outright
+  payee: { vpa: denied@bankb, name: Blocked Account, age_days: 200, denylist: true }
+  request: { amount: 500, entry: typed }
+  expect: { tier: BLOCK, action: DECLINE, rules_include: [R-01], reasons_include_any: [PAYEE_REPORTED] }
+
+- id: G-R01n
+  title: Same payee without the denylist flag, long relationship, stays Safe
+  payee: { vpa: landlord@banka, name: Sharma Properties, age_days: 900, recv: 30 }
+  known: { count: 6, first_paid_days_ago: 150 }
+  request: { amount: 12000, entry: contact, note: rent }
+  expect: { tier: SAFE, rules_include: [R-09], rules_exclude: [R-01] }
+
+- id: G-R02
+  needs_model: true
+  title: Flagged caller on the line and a new payee
+  payee: { vpa: stranger1@bankb, name: Rahul Verma, age_days: 300, recv: 12 }
+  call: { active: true, risk: 3, known: false, started_min_ago: 8 }
+  request: { amount: 3000, entry: typed }
+  expect: { tier: BLOCK, rules_include: [R-02], reasons_include_any: [CALLER_FLAGGED] }
+
+- id: G-R02n
+  title: Flagged caller but the payee has been paid for months
+  payee: { vpa: oldfriend@banka, name: Anil Kumar, age_days: 700, recv: 25 }
+  known: { count: 8, first_paid_days_ago: 200 }
+  call: { active: true, risk: 3, known: false, started_min_ago: 8 }
+  request: { amount: 1500, entry: contact }
+  expect: { rules_exclude: [R-02], max_tier: WARNING }
+
+- id: G-R03
+  needs_model: true
+  title: New payee, amount far above normal, on a call with an unknown number
+  payee: { vpa: stranger2@bankb, name: Suresh Pal, age_days: 250, recv: 10 }
+  call: { active: true, risk: 0, known: false, started_min_ago: 6 }
+  request: { amount: 45000, entry: typed }
+  expect: { min_tier: STEP_UP, rules_include: [R-03] }
+
+- id: G-R03n
+  title: Same payment while on a call with a known contact
+  payee: { vpa: stranger2b@bankb, name: Suresh Pal, age_days: 250, recv: 10 }
+  call: { active: true, risk: 0, known: true, started_min_ago: 6 }
+  request: { amount: 45000, entry: typed }
+  expect: { rules_exclude: [R-03] }
+
+- id: G-R04
+  title: Young personal UPI ID with a burst of first-time payers
+  payee: { vpa: burst@bankb, name: Vikram Sethi, age_days: 2, fan_in_1h: 14, first_time_ratio: 1.0 }
+  request: { amount: 1200, entry: pasted }
+  expect: { min_tier: WARNING, rules_include: [R-04], reasons_include_any: [PAYEE_FAN_IN] }
+
+- id: G-R04n
+  title: Old UPI ID with the same number of payers
+  payee: { vpa: popular@banka, name: Meena Stores, kind: merchant, verified: true, age_days: 600, recv: 300, fan_in_1h: 14, first_time_ratio: 0.3 }
+  request: { amount: 300, entry: qr, claimed: Meena Stores }
+  expect: { tier: SAFE, rules_exclude: [R-04] }
+
+- id: G-R05
+  needs_model: true
+  title: New device, new payee, more than ten thousand rupees
+  payee: { vpa: stranger3@bankb, name: Kiran Rao, age_days: 400, recv: 15 }
+  device: { new: true }
+  request: { amount: 15000, entry: typed }
+  expect: { min_tier: STEP_UP, rules_include: [R-05], reasons_include_any: [DEVICE_CHANGED] }
+
+- id: G-R05n
+  title: New device paying a long-standing payee
+  payee: { vpa: grocer@banka, name: FreshMart Groceries, kind: merchant, verified: true, age_days: 900, recv: 400 }
+  known: { count: 20, first_paid_days_ago: 300 }
+  device: { new: true }
+  request: { amount: 15000, entry: qr, claimed: FreshMart Groceries }
+  expect: { rules_exclude: [R-05], max_tier: WARNING }
+
+- id: G-R06
+  title: Third payment to a new UPI ID within ten minutes
+  payer: { new_payees_last_10m: 3 }
+  payee: { vpa: stranger4@bankb, name: Deepa Nair, age_days: 300, recv: 8 }
+  request: { amount: 900, entry: typed }
+  expect: { rules_include: [R-06] }
+
+- id: G-R07
+  title: Payment note in scam wording
+  payee: { vpa: stranger5@bankb, name: Ajay Singh, age_days: 300, recv: 8 }
+  request: { amount: 499, entry: typed, note: refund processing fee }
+  expect: { rules_include: [R-07] }
+
+- id: G-R08
+  title: Payment would empty the account
+  payer: { balance: 50000 }
+  payee: { vpa: stranger6@bankb, name: Nitin Shah, age_days: 300, recv: 8 }
+  request: { amount: 46000, entry: typed }
+  expect: { rules_include: [R-08], min_tier: WARNING }
+
+- id: G-R10
+  title: Payee appears in a message the payer flagged as a scam
+  payee: { vpa: refund.desk@bankb, name: Rakesh Kumar, age_days: 4 }
+  msg: { prob: 0.95, label: refund_bait, family: FAKE_REFUND, payee_in_msg: true }
+  request: { amount: 4999, entry: link, claimed: SBI Refund Desk }
+  expect: { tier: BLOCK, action: DECLINE, rules_include: [R-10], reasons_include_any: [PAYEE_IN_SCAM_MESSAGE] }
+
+- id: G-R11
+  title: Pasted UPI ID, new payee, repeated app switching, above-normal amount
+  payee: { vpa: stranger7@bankb, name: Farhan Ali, age_days: 300, recv: 8 }
+  request: { amount: 9000, entry: pasted, app_switches: 3, dwell: 90 }
+  expect: { rules_include: [R-11] }
+
+- id: G-R12
+  title: Institutional name on a personal account, first payment
+  payee: { vpa: sbi.refund@bankb, name: Rakesh Kumar, age_days: 200, recv: 6 }
+  request: { amount: 800, entry: link, claimed: SBI Refund Desk }
+  expect: { min_tier: WARNING, rules_include: [R-12b, R-12c], reasons_include_any: [NAME_MISMATCH] }
+
+- id: G-R12a
+  title: QR name does not match the registered name, not institutional
+  payee: { vpa: shopx@banka, name: Ramesh Gupta, kind: merchant, age_days: 500, recv: 60 }
+  request: { amount: 350, entry: qr, claimed: Blue Lotus Boutique }
+  expect: { rules_include: [R-12a], max_tier: WARNING }
+
+- id: G-R13
+  title: Scam message flag active and a new payee
+  payee: { vpa: stranger8@bankb, name: Pooja Iyer, age_days: 300, recv: 8 }
+  msg: { prob: 0.9, label: kyc_bill_threat, family: KYC_BILL_THREAT }
+  request: { amount: 700, entry: typed }
+  expect: { min_tier: WARNING, rules_include: [R-13], reasons_include_any: [MESSAGE_FLAGGED] }
+
+- id: G-R14
+  title: Payee forwards to a reported account
+  payee: { vpa: layer1@bankb, name: Imran Shaikh, age_days: 20, recv: 9, graph: { downstream_hop: 1, shares_device_with_reported: 1, passthrough_ratio: 0.95 } }
+  request: { amount: 2000, entry: typed }
+  expect: { rules_include: [R-14], reasons_include_any: [PAYEE_NEAR_REPORTED, PAYEE_PASSTHROUGH] }
+
+- id: G-R15a
+  title: Another bank has reported the payee, not yet confirmed
+  payee: { vpa: cons1@bankb, name: Sanjay Yadav, age_days: 120, recv: 10, consortium: { confirmed: false } }
+  request: { amount: 1500, entry: typed }
+  expect: { rules_include: [R-15a], rules_exclude: [R-15b] }
+
+- id: G-R15b
+  needs_model: true
+  title: Another bank has confirmed fraud on the payee
+  payee: { vpa: cons2@bankb, name: Sanjay Yadav, age_days: 120, recv: 10, consortium: { confirmed: true } }
+  request: { amount: 1500, entry: typed }
+  expect: { min_tier: STEP_UP, rules_include: [R-15a, R-15b], reasons_include_any: [REPORTED_AT_OTHER_BANK] }
+
+- id: G-R16
+  title: First payment to an account with confirmed fraud at this bank
+  payee: { vpa: mule1@bankb, name: Pooja Singh, age_days: 40, recv: 15, bad: 5, confirmed: 1 }
+  request: { amount: 600, entry: typed }
+  expect: { tier: BLOCK, action: DECLINE, rules_include: [R-16], reasons_include_any: [PAYEE_REPORTED] }
+
+- id: G-R17
+  title: First-time payee and an unusually large amount, nothing else
+  payee: { vpa: tutor@banka, name: Anita Desai, age_days: 500, recv: 14 }
+  request: { amount: 30000, entry: typed }
+  expect: { min_tier: WARNING, max_tier: WARNING, rules_include: [R-17], reasons_include_any: [AMOUNT_UNUSUAL, NEW_PAYEE] }
+
+# ---------------------------------------------------------------- scam families
+- id: G-F1
+  title: Digital arrest - long call from a flagged number, pasted ID, most of the balance
+  needs_model: true
+  payee: { vpa: cyber.cell@bankb, name: Imran Shaikh, age_days: 3, recv: 5 }
+  call: { active: true, risk: 3, known: false, started_min_ago: 25 }
+  request: { amount: 180000, entry: pasted, app_switches: 4, dwell: 140, claimed: Cyber Cell Verification }
+  expect: { tier: BLOCK, action: HOLD, family: DIGITAL_ARREST, rules_include: [R-02], reasons_include_any: [CALLER_FLAGGED, CALL_ACTIVE_UNKNOWN] }
+
+- id: G-F2
+  title: Fake refund - recent flagged call, link, institutional name, refund note
+  needs_model: true
+  payee: { vpa: refund.desk7@bankb, name: Rakesh Kumar, age_days: 4, recv: 5 }
+  call: { active: false, risk: 3, known: false, started_min_ago: 11, ended_min_ago: 6 }
+  request: { amount: 4999, entry: link, app_switches: 2, dwell: 80, claimed: SBI Refund Desk, note: refund processing fee }
+  expect: { min_tier: STEP_UP, family: FAKE_REFUND, reasons_include_any: [NAME_MISMATCH, CALLER_FLAGGED] }
+
+- id: G-F3
+  title: Mule transfer - young UPI ID collecting from many first-time payers
+  needs_model: true
+  payee: { vpa: booking.advance@bankb, name: Vikram Sethi, age_days: 3, recv: 30, fan_in_1h: 37, first_time_ratio: 1.0 }
+  request: { amount: 12000, entry: pasted, app_switches: 1, dwell: 45, note: advance for booking }
+  expect: { min_tier: STEP_UP, family: MULE_TRANSFER, reasons_include_any: [PAYEE_FAN_IN] }
+
+- id: G-F4
+  title: Impersonation - "new number" message, pasted ID, large amount, vendor name
+  needs_model: true
+  payee: { vpa: vendor.payments@banka, name: Anil Traders, age_days: 2, recv: 1 }
+  msg: { prob: 0.93, label: impersonation_request, family: IMPERSONATION }
+  request: { amount: 85000, entry: pasted, app_switches: 3, dwell: 90, claimed: Mehta Suppliers Pvt Ltd, note: vendor payment urgent new account }
+  expect: { min_tier: STEP_UP, family: IMPERSONATION }
+
+- id: G-F5
+  title: KYC threat - flagged message, recent call, link, institutional name
+  needs_model: true
+  payee: { vpa: kyc.update.sbi@bankb, name: Sanjay Yadav, age_days: 6, recv: 4 }
+  msg: { prob: 0.94, label: kyc_bill_threat, family: KYC_BILL_THREAT }
+  call: { active: false, risk: 2, known: false, started_min_ago: 7, ended_min_ago: 3 }
+  request: { amount: 2499, entry: link, app_switches: 2, dwell: 60, claimed: SBI KYC Update, note: kyc update charge }
+  expect: { min_tier: STEP_UP, family: KYC_BILL_THREAT }
+
+- id: G-F6
+  title: Investment scam - offer message, task-deposit note, pasted ID
+  needs_model: true
+  payee: { vpa: quick.returns@banka, name: Deepak Nair, age_days: 12, recv: 4 }
+  msg: { prob: 0.92, label: investment_task, family: INVESTMENT_TASK }
+  request: { amount: 25000, entry: pasted, app_switches: 2, dwell: 70, claimed: Alpha Trading Desk, note: task deposit plan A }
+  expect: { min_tier: STEP_UP, family: INVESTMENT_TASK }
+
+# ---------------------------------------------------------------- honest payments that look risky
+- id: G-N1
+  title: First-time, high-value honest payment with no call and no message
+  payee: { vpa: newlandlord@banka, name: Kapoor Estates, age_days: 700, recv: 20 }
+  request: { amount: 60000, entry: typed, dwell: 50 }
+  expect: { max_tier: WARNING }
+
+- id: G-N2
+  title: Paying a known friend while on a call with a known contact
+  payee: { vpa: friend@banka, name: Rohit Mehta, age_days: 800, recv: 18 }
+  known: { count: 9, first_paid_days_ago: 240 }
+  call: { active: true, risk: 0, known: true, started_min_ago: 4 }
+  request: { amount: 700, entry: contact }
+  expect: { tier: SAFE }
+
+- id: G-N3
+  title: Pasted a UPI ID a friend sent in chat, small amount
+  payee: { vpa: newfriend@banka, name: Sneha Kulkarni, age_days: 600, recv: 12 }
+  request: { amount: 450, entry: pasted, app_switches: 1 }
+  expect: { max_tier: WARNING }
+
+- id: G-N4
+  title: New shop with a genuine rush of first-time customers
+  payee: { vpa: newcafe@banka, name: Third Wave Cafe, kind: merchant, age_days: 3, recv: 40, fan_in_1h: 40, first_time_ratio: 1.0 }
+  request: { amount: 280, entry: qr, claimed: Third Wave Cafe }
+  expect: { max_tier: WARNING, rules_exclude: [R-04] }
+
+- id: G-N5
+  title: Honest payment from a new phone to a familiar shop
+  payee: { vpa: grocer2@banka, name: City Kirana, kind: merchant, verified: true, age_days: 900, recv: 300 }
+  known: { count: 12, first_paid_days_ago: 200 }
+  device: { new: true }
+  request: { amount: 640, entry: qr, claimed: City Kirana }
+  expect: { max_tier: WARNING }
+
+- id: G-N6
+  title: Shop registered in its owner's name, paid many times before
+  payee: { vpa: tailor@banka, name: Ramesh Gupta, kind: merchant, age_days: 800, recv: 90 }
+  known: { count: 7, first_paid_days_ago: 180 }
+  request: { amount: 900, entry: qr, claimed: Royal Tailors }
+  expect: { tier: SAFE, rules_include: [R-09] }
+
+- id: G-N7
+  title: Payer flagged a scam message, then pays their usual landlord
+  payee: { vpa: landlord2@banka, name: Sharma Properties, age_days: 900, recv: 30 }
+  known: { count: 6, first_paid_days_ago: 150 }
+  msg: { prob: 0.95, label: refund_bait, family: FAKE_REFUND }
+  request: { amount: 12000, entry: contact, note: rent }
+  expect: { tier: SAFE, rules_include: [R-09], rules_exclude: [R-13] }
+
+- id: G-N8
+  title: Bank service point run by an individual, used regularly
+  payee: { vpa: csp@banka, name: Lata Pawar, age_days: 700, recv: 120 }
+  known: { count: 5, first_paid_days_ago: 90 }
+  request: { amount: 2000, entry: qr, claimed: SBI Customer Service Point }
+  expect: { tier: SAFE, rules_include: [R-09], rules_exclude: [R-12c] }
+
+# ---------------------------------------------------------------- policy
+- id: G-P1
+  title: Block mode set to decline turns the digital-arrest hold into a decline
+  needs_model: true
+  policy: { block_mode: decline }
+  payee: { vpa: cyber.cell2@bankb, name: Imran Shaikh, age_days: 3, recv: 5 }
+  call: { active: true, risk: 3, known: false, started_min_ago: 25 }
+  request: { amount: 180000, entry: pasted, app_switches: 4, dwell: 140 }
+  expect: { tier: BLOCK, action: DECLINE }
+
+- id: G-P2
+  title: Still a Block when re-assessed after a hold - declined, never held twice
+  needs_model: true
+  parent: true
+  payee: { vpa: cyber.cell3@bankb, name: Imran Shaikh, age_days: 3, recv: 5 }
+  call: { active: true, risk: 3, known: false, started_min_ago: 90 }
+  request: { amount: 180000, entry: pasted, app_switches: 4, dwell: 140 }
+  expect: { tier: BLOCK, action: DECLINE }
+
+- id: G-P3
+  needs_model: true
+  title: Stricter thresholds move the large first-time payment from Warning to Step-Up
+  policy: { t_warning: 0.10, t_stepup: 0.25, t_block: 0.85 }
+  payee: { vpa: tutor2@banka, name: Anita Desai, age_days: 500, recv: 14 }
+  request: { amount: 30000, entry: typed }
+  expect: { tier: STEP_UP }
+
+# ---------------------------------------------------------------- degraded mode
+- id: G-D1
+  title: Model unavailable - a clear scam is capped at Warning, never blocked by the outage
+  model_down: true
+  payee: { vpa: cyber.cell4@bankb, name: Imran Shaikh, age_days: 3, recv: 5 }
+  call: { active: true, risk: 3, known: false, started_min_ago: 25 }
+  request: { amount: 180000, entry: pasted, app_switches: 4, dwell: 140 }
+  expect: { tier: WARNING, degraded: true }
+
+- id: G-D2
+  title: Model unavailable but the payee is on the denylist - still declined
+  model_down: true
+  payee: { vpa: denied2@bankb, name: Blocked Account, age_days: 200, denylist: true }
+  request: { amount: 500, entry: typed }
+  expect: { tier: BLOCK, action: DECLINE, degraded: true, rules_include: [R-01] }
+
+- id: G-D3
+  title: Cache unavailable - ordinary payment still gets a decision, at most a Warning
+  cache_down: true
+  payee: { vpa: stranger9@bankb, name: Kiran Rao, age_days: 300, recv: 8 }
+  request: { amount: 90000, entry: typed }
+  expect: { max_tier: WARNING, degraded: true }
+
+- id: G-D4
+  title: Cache unavailable but the payee is on the denylist - still declined
+  cache_down: true
+  payee: { vpa: denied3@bankb, name: Blocked Account, age_days: 200, denylist: true }
+  request: { amount: 500, entry: typed }
+  expect: { tier: BLOCK, action: DECLINE, degraded: true }

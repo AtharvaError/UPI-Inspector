@@ -1,0 +1,116 @@
+# UPI Inspector rule set. See docs/06-risk-engine-and-ml.md, section 2.
+# effect: floor (score cannot go below), cap (cannot go above), bump (added to the rule score).
+# Session signals (R-11) come from the client and may only bump.
+version: rules-0.6.0
+rules:
+  - id: R-01
+    when: payee_on_denylist == 1
+    effect: { floor: 0.95 }
+    hard: true
+    reason: PAYEE_REPORTED
+
+  - id: R-10
+    when: payee_in_flagged_msg == 1
+    effect: { floor: 0.95 }
+    hard: true
+    reason: PAYEE_IN_SCAM_MESSAGE
+
+  - id: R-16
+    when: confirmed_90d >= 1 and is_new_payee == 1
+    effect: { floor: 0.95 }
+    hard: true
+    reason: PAYEE_REPORTED
+
+  - id: R-02
+    when: caller_risk == 3 and (call_active == 1 or mins_since_call_end < 10) and is_new_payee == 1
+    effect: { floor: 0.85 }
+    reason: CALLER_FLAGGED
+
+  - id: R-03
+    when: is_new_payee == 1 and amount_over_p95 > 5 and call_active == 1 and caller_unknown == 1
+    effect: { floor: 0.60 }
+    reason: CALL_ACTIVE_UNKNOWN
+
+  - id: R-05
+    when: device_is_new == 1 and is_new_payee == 1 and amount > 10000
+    effect: { floor: 0.60 }
+    reason: DEVICE_CHANGED
+
+  - id: R-15b
+    when: consortium_reported == 1 and consortium_confirmed == 1
+    effect: { floor: 0.60 }
+    reason: REPORTED_AT_OTHER_BANK
+
+  # --- Warning-level floors: one clear signal guarantees at least a banner ---------------
+  - id: R-17
+    when: is_new_payee == 1 and amount_over_p95 > 3 and amount >= 5000
+    effect: { floor: 0.30 }
+    reason: AMOUNT_UNUSUAL
+
+  - id: R-12c
+    when: claimed_name_institutional == 1 and payee_is_individual == 1 and is_new_payee == 1
+    effect: { floor: 0.30 }
+    reason: NAME_MISMATCH
+
+  - id: R-04
+    when: payee_is_individual == 1 and vpa_age_days < 7 and fan_in_1h >= 10 and first_time_payer_ratio_24h >= 0.8
+    effect: { bump: 0.25, floor: 0.30 }
+    reason: PAYEE_FAN_IN
+
+  # A personal account less than a week old that twenty or more strangers have paid within the hour, and this
+  # payer has never paid it: a pause and one question. The simulated history has no burst this large (its world
+  # is under a thousand people), so this rule's false-positive rate is not measured there.
+  - id: R-04b
+    when: payee_is_individual == 1 and vpa_age_days < 7 and fan_in_1h >= 20 and first_time_payer_ratio_24h >= 0.8 and is_new_payee == 1 and amount >= 2000
+    effect: { floor: 0.60 }
+    reason: PAYEE_FAN_IN
+
+  - id: R-06
+    when: new_payees_10m >= 3
+    effect: { bump: 0.20 }
+    reason: RAPID_NEW_PAYEES
+
+  - id: R-07
+    when: note_scam_prob >= 0.8
+    effect: { bump: 0.15 }
+    reason: NOTE_SCAM_LANGUAGE
+
+  - id: R-08
+    when: balance_fraction >= 0.8
+    effect: { bump: 0.15 }
+    reason: BALANCE_DRAIN
+
+  - id: R-11
+    when: vpa_entry_method in ('pasted', 'link') and is_new_payee == 1 and app_switch_count >= 2 and amount_over_p95 > 1
+    effect: { bump: 0.15 }
+    reason: APP_SWITCHING
+
+  - id: R-12b
+    when: claimed_name_institutional == 1 and payee_is_individual == 1
+    effect: { bump: 0.30 }
+    reason: NAME_MISMATCH
+
+  - id: R-12a
+    when: vpa_entry_method in ('qr', 'link') and name_match_score < 0.5 and not (claimed_name_institutional == 1 and payee_is_individual == 1)
+    effect: { bump: 0.20 }
+    reason: NAME_MISMATCH
+
+  - id: R-13
+    when: msg_flag_active == 1 and is_new_payee == 1
+    effect: { bump: 0.20, floor: 0.30 }
+    reason: MESSAGE_FLAGGED
+
+  - id: R-14
+    when: downstream_hop == 1 or shares_device_with_reported == 1 or (passthrough_ratio >= 0.8 and fan_in_24h >= 5)
+    effect: { bump: 0.20, floor: 0.30 }
+    reason: PAYEE_NEAR_REPORTED
+
+  - id: R-15a
+    when: consortium_reported == 1
+    effect: { bump: 0.25 }
+    reason: REPORTED_AT_OTHER_BANK
+
+  - id: R-09
+    when: prior_txn_count >= 3 and days_since_first_paid >= 30 and reports_30d == 0 and confirmed_90d == 0
+    effect: { cap: 0.29 }
+    unless: [R-01, R-10, R-16]

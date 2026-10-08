@@ -1,0 +1,92 @@
+[
+  {
+    "code": "digital_arrest_1", "locale": "en", "family": "DIGITAL_ARREST", "title": "The 'officer' on the phone", "minutes": 1.5,
+    "script": {
+      "start": "n1",
+      "nodes": {
+        "n1": {"speaker": "scammer", "text": "This is Inspector Verma from the Cyber Cell. A parcel in your name was stopped at customs with illegal items. This is a serious offence.",
+          "options": [
+            {"label": "Oh no. What should I do?", "next": "n2", "verdict": "risky", "feedback": "Engaging keeps you on the call. Real police do not phone to announce an arrest."},
+            {"label": "I will call my local police station myself.", "next": "end", "verdict": "safe", "feedback": "Right. Hang up and call a number you looked up yourself."}
+          ]},
+        "n2": {"speaker": "scammer", "text": "You are under digital arrest. Stay on this video call. Do not tell your family; they could be charged too.",
+          "options": [
+            {"label": "I will stay on the call and keep this to myself.", "next": "n3", "verdict": "risky", "feedback": "Secrecy is the scammer's tool. There is no such thing as a digital arrest in Indian law."},
+            {"label": "I am hanging up and telling my son.", "next": "end", "verdict": "safe", "feedback": "Telling someone you trust breaks the scam. Do it early."}
+          ]},
+        "n3": {"speaker": "scammer", "text": "To prove your money is clean, transfer your savings to the RBI verification account. It will be returned in two hours.",
+          "options": [
+            {"label": "Send the money to clear my name.", "next": "end", "verdict": "risky", "feedback": "No authority verifies money by taking it. Money sent this way is gone."},
+            {"label": "No government agency asks for money over UPI. I am calling 1930.", "next": "end", "verdict": "safe", "feedback": "Exactly. 1930 is the national cybercrime helpline."}
+          ]},
+        "end": {"speaker": "narrator", "text": "That is how a digital-arrest scam runs: fear, isolation, then a 'safe account'.", "options": []}
+      },
+      "signs": ["They say you are in trouble and must stay on the call.", "They tell you not to talk to family or the bank.", "They ask you to move money to a 'safe' or 'verification' account."]
+    }
+  },
+  {
+    "code": "fake_refund_1", "locale": "en", "family": "FAKE_REFUND", "title": "The refund that costs money", "minutes": 1.0,
+    "script": {
+      "start": "n1",
+      "nodes": {
+        "n1": {"speaker": "scammer", "text": "Hello, I am calling from customer care. Your refund of ₹4,999 is stuck. I have sent you a link, just open it.",
+          "options": [
+            {"label": "Open the link.", "next": "n2", "verdict": "risky", "feedback": "Refunds arrive on their own. A link from a caller is a warning sign."},
+            {"label": "I will check the order in the official app.", "next": "end", "verdict": "safe", "feedback": "Right. Always go to the app or website yourself."}
+          ]},
+        "n2": {"speaker": "scammer", "text": "Now enter your UPI PIN to receive the refund. It is only for verification.",
+          "options": [
+            {"label": "Enter my UPI PIN.", "next": "end", "verdict": "risky", "feedback": "You enter your PIN only to SEND money. Never to receive it."},
+            {"label": "A PIN means I am paying. I am ending this call.", "next": "end", "verdict": "safe", "feedback": "Exactly right. That one rule stops most refund scams."}
+          ]},
+        "end": {"speaker": "narrator", "text": "A refund scam always turns 'receiving' into 'paying'.", "options": []}
+      },
+      "signs": ["Someone calls you about a refund you did not ask for.", "You are asked to pay a fee, scan a code or enter your PIN to receive money.", "The name on the screen is not the company's."]
+    }
+  },
+  {
+    "code": "impersonation_1", "locale": "en", "family": "IMPERSONATION", "title": "The boss with a new number", "minutes": 1.0,
+    "script": {
+      "start": "n1",
+      "nodes": {
+        "n1": {"speaker": "scammer", "text": "Hi, it's Mr. Mehta. This is my new number. I'm in a meeting and can't talk. I need you to pay a vendor ₹85,000 right now.",
+          "options": [
+            {"label": "Sure, send me the UPI ID.", "next": "n2", "verdict": "risky", "feedback": "A new number plus urgency is the classic pattern. Verify first."},
+            {"label": "I will call you on your usual number to confirm.", "next": "end", "verdict": "safe", "feedback": "Right. Use the number you already have, not the one that just messaged you."}
+          ]},
+        "n2": {"speaker": "scammer", "text": "Don't call, I'm with the board. Their account changed, pay to the UPI ID I sent. Keep this confidential.",
+          "options": [
+            {"label": "Pay it quickly so he is not annoyed.", "next": "end", "verdict": "risky", "feedback": "\"Don't call\" and \"keep it confidential\" are there to stop you checking."},
+            {"label": "Changed account details always get verified. I will wait until I reach him.", "next": "end", "verdict": "safe", "feedback": "Correct. A real manager would rather you check."}
+          ]},
+        "end": {"speaker": "narrator", "text": "Impersonation works by borrowing someone's authority and adding a deadline.", "options": []}
+      },
+      "signs": ["A known person contacts you from a new number.", "They say they cannot talk and need money urgently.", "The account details have 'changed'."]
+    }
+  },
+  {
+    "code": "digital_arrest_1", "locale": "hi", "family": "DIGITAL_ARREST", "title": "फोन पर 'अफ़सर'", "minutes": 1.5,
+    "script": {
+      "start": "n1",
+      "nodes": {
+        "n1": {"speaker": "scammer", "text": "मैं साइबर सेल से इंस्पेक्टर वर्मा बोल रहा हूँ। आपके नाम का एक पार्सल कस्टम में पकड़ा गया है, जिसमें गैरकानूनी सामान है। यह गंभीर अपराध है।",
+          "options": [
+            {"label": "अरे! अब मुझे क्या करना चाहिए?", "next": "n2", "verdict": "risky", "feedback": "बातचीत जारी रखना आपको कॉल पर रोके रखता है। असली पुलिस फोन करके गिरफ्तारी नहीं बताती।"},
+            {"label": "मैं खुद अपने थाने में फोन करके पूछ लूँगा।", "next": "end", "verdict": "safe", "feedback": "सही। कॉल काटें और खुद ढूँढे हुए नंबर पर फोन करें।"}
+          ]},
+        "n2": {"speaker": "scammer", "text": "आप डिजिटल अरेस्ट में हैं। इस वीडियो कॉल पर बने रहिए। परिवार को मत बताइए, उन पर भी केस हो सकता है।",
+          "options": [
+            {"label": "मैं कॉल पर रहूँगा और किसी को नहीं बताऊँगा।", "next": "n3", "verdict": "risky", "feedback": "गोपनीयता ठग का हथियार है। भारतीय कानून में डिजिटल अरेस्ट जैसी कोई चीज़ नहीं है।"},
+            {"label": "मैं कॉल काटकर अपने बेटे को बता रहा हूँ।", "next": "end", "verdict": "safe", "feedback": "किसी भरोसेमंद को बताना ठगी तोड़ देता है। जल्दी बताएँ।"}
+          ]},
+        "n3": {"speaker": "scammer", "text": "अपना पैसा साफ़ साबित करने के लिए अपनी बचत आरबीआई के सत्यापन खाते में भेज दीजिए। दो घंटे में वापस मिल जाएगा।",
+          "options": [
+            {"label": "नाम साफ़ करने के लिए पैसे भेज देता हूँ।", "next": "end", "verdict": "risky", "feedback": "कोई भी विभाग पैसा लेकर जाँच नहीं करता। इस तरह भेजा गया पैसा वापस नहीं आता।"},
+            {"label": "कोई सरकारी विभाग UPI से पैसे नहीं माँगता। मैं 1930 पर कॉल कर रहा हूँ।", "next": "end", "verdict": "safe", "feedback": "बिल्कुल सही। 1930 राष्ट्रीय साइबर अपराध हेल्पलाइन है।"}
+          ]},
+        "end": {"speaker": "narrator", "text": "डिजिटल अरेस्ट की ठगी ऐसे चलती है: डर, अकेलापन, और फिर 'सुरक्षित खाता'।", "options": []}
+      },
+      "signs": ["वे कहते हैं कि आप मुसीबत में हैं और कॉल पर बने रहना होगा।", "वे परिवार या बैंक से बात करने से मना करते हैं।", "वे पैसा 'सुरक्षित' या 'सत्यापन' खाते में भेजने को कहते हैं।"]
+    }
+  }
+]

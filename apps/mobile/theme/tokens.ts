@@ -1,0 +1,117 @@
+// Generated from packages/design-tokens/tokens.json. Do not edit.
+export const tokens = {
+  "color": {
+    "bg": "#070614",
+    "bgGlowViolet": "rgba(109, 74, 255, 0.22)",
+    "bgGlowBlue": "rgba(47, 107, 255, 0.12)",
+    "surface": "#0F0D1F",
+    "surfaceRaised": "#16142B",
+    "surfaceSunken": "#0B0A18",
+    "surfaceHover": "#1B1836",
+    "border": "#221F3A",
+    "borderStrong": "#34315A",
+    "text": "#F5F4FF",
+    "textSecondary": "#A7A4C2",
+    "textMuted": "#6F6C8F",
+    "textInverse": "#0B0A18",
+    "brand": "#6D4AFF",
+    "brandHover": "#7F61FF",
+    "brandSubtle": "rgba(109, 74, 255, 0.16)",
+    "brandOn": "#FFFFFF",
+    "accent": "#2F6BFF",
+    "accentCyan": "#38D6FF",
+    "white": "#FFFFFF",
+    "safe": "#34D399",
+    "safeSubtle": "rgba(52, 211, 153, 0.14)",
+    "safeOn": "#04130D",
+    "warning": "#FBBF24",
+    "warningSubtle": "rgba(251, 191, 36, 0.14)",
+    "warningOn": "#1A1202",
+    "stepup": "#FB923C",
+    "stepupSubtle": "rgba(251, 146, 60, 0.16)",
+    "stepupOn": "#1C0D02",
+    "block": "#F43F5E",
+    "blockSubtle": "rgba(244, 63, 94, 0.16)",
+    "blockOn": "#FFFFFF",
+    "neutralChip": "#2A2745",
+    "neutralChipText": "#C9C6E6",
+    "chart1": "#6D4AFF",
+    "chart2": "#38D6FF",
+    "chart3": "#34D399",
+    "chart4": "#FBBF24",
+    "chart5": "#FB923C",
+    "chart6": "#F43F5E"
+  },
+  "font": {
+    "display": "DM Sans",
+    "body": "DM Sans",
+    "mono": "JetBrains Mono",
+    "devanagari": "Noto Sans Devanagari"
+  },
+  "type": {
+    "display": {
+      "size": 30,
+      "line": 36,
+      "weight": 700
+    },
+    "title": {
+      "size": 22,
+      "line": 28,
+      "weight": 600
+    },
+    "heading": {
+      "size": 17,
+      "line": 24,
+      "weight": 600
+    },
+    "body": {
+      "size": 15,
+      "line": 22,
+      "weight": 400
+    },
+    "bodyLarge": {
+      "size": 18,
+      "line": 27,
+      "weight": 400
+    },
+    "caption": {
+      "size": 12.5,
+      "line": 18,
+      "weight": 500
+    },
+    "amount": {
+      "size": 34,
+      "line": 40,
+      "weight": 700
+    }
+  },
+  "space": [
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    32,
+    40
+  ],
+  "radius": {
+    "sm": 8,
+    "md": 12,
+    "lg": 20,
+    "xl": 28,
+    "pill": 999
+  },
+  "shadow": {
+    "card": "0 0 0 1px rgba(255,255,255,0.06), 0 12px 40px rgba(8,6,24,0.6)",
+    "brand": "0 8px 30px rgba(109,74,255,0.35)"
+  },
+  "motion": {
+    "fast": 120,
+    "base": 220,
+    "slow": 380,
+    "easingStandard": "cubic-bezier(0.2, 0, 0, 1)",
+    "easingEmphasised": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+  }
+} as const;
+export type Tokens = typeof tokens;

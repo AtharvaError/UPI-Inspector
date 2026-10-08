@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "UPI Inspector",
+    "slug": "upi-inspector",
+    "version": "2.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#070614",
+    "scheme": "upiinspector",
+    "newArchEnabled": true,
+    "android": { "package": "demo.upiinspector.app" },
+    "ios": { "bundleIdentifier": "demo.upiinspector.app" },
+    "web": { "bundler": "metro", "output": "single", "backgroundColor": "#070614", "themeColor": "#070614", "name": "UPI Inspector" },
+    "plugins": [
+      "expo-font",
+      "expo-sharing",
+      ["expo-camera", { "cameraPermission": "The camera is used to scan UPI QR codes." }],
+      ["expo-local-authentication", { "faceIDPermission": "Used to confirm a risky payment." }]
+    ]
+  }
+}

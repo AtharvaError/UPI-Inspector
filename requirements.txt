@@ -1,0 +1,28 @@
+# UPI Inspector - Python dependencies (service + ML + tests), Python 3.12
+fastapi>=0.115
+uvicorn>=0.30
+httptools>=0.6          # faster HTTP parsing for uvicorn; picked up automatically
+pydantic>=2.7
+pydantic-settings>=2.3
+asyncpg>=0.29
+redis>=5.0
+fakeredis>=2.26
+python-socketio>=5.11
+pyjwt>=2.8
+argon2-cffi>=23.1
+numpy>=1.26
+xgboost>=2.1
+# 1.9.x ships a binary that Windows Smart App Control blocks on some laptops; 1.8 loads fine.
+scikit-learn>=1.5,<1.9
+joblib>=1.4
+rapidfuzz>=3.9
+networkx>=3.3
+fpdf2>=2.7
+httpx>=0.27
+pyyaml>=6.0
+prometheus-client>=0.20
+pgserver>=0.1.4
+pandas>=2.2
+pyarrow>=16
+pytest>=8.2
+pytest-asyncio>=0.23

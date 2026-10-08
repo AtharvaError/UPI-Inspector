@@ -1,0 +1,161 @@
+{
+  "reasons": {
+    "NEW_PAYEE": "You have never paid this UPI ID before.",
+    "PAYEE_NEW_VPA": "This UPI ID was created {vpa_age} ago.",
+    "PAYEE_FAN_IN": "{fan_in_1h} different people have paid this UPI ID in the last hour.",
+    "PAYEE_REPORTED": "This UPI ID has been reported for fraud.",
+    "PAYEE_NEAR_REPORTED": "Money sent to this UPI ID is quickly passed on to an account reported for fraud.",
+    "PAYEE_PASSTHROUGH": "This UPI ID forwards almost everything it receives within minutes.",
+    "REPORTED_AT_OTHER_BANK": "This UPI ID has been reported by customers of another bank.",
+    "CALL_ACTIVE_UNKNOWN": "You are on a call with a number that is not in your contacts.",
+    "CALLER_FLAGGED": "The number that called you {mins_since_call} minutes ago is flagged for fraud.",
+    "CALLER_FLAGGED.active": "The number you are on a call with is flagged for fraud.",
+    "MESSAGE_FLAGGED": "You recently received a message that looks like a scam.",
+    "PAYEE_IN_SCAM_MESSAGE": "This UPI ID appeared in a message you flagged as a scam.",
+    "AMOUNT_UNUSUAL": "This is {amount_ratio} times larger than your usual payment.",
+    "AMOUNT_UNUSUAL.generic": "This payment is unusual for your account.",
+    "BALANCE_DRAIN": "This payment would use most of your balance.",
+    "DEVICE_CHANGED": "You are paying from a device first used {device_age} ago.",
+    "DEVICE_CHANGED.new": "You are paying from a device you have not used before.",
+    "RAPID_NEW_PAYEES": "This is your {n} payment to a new UPI ID in 10 minutes.",
+    "VPA_PASTED": "You pasted this UPI ID instead of choosing a saved contact.",
+    "APP_SWITCHING": "You switched to another app {app_switch_count} times while making this payment.",
+    "NAME_MISMATCH": "{source} says \"{claimed_name}\" but this UPI ID is registered to \"{registered_name}\".",
+    "NOTE_SCAM_LANGUAGE": "The payment message uses wording common in {family_name} scams.",
+    "ODD_HOUR": "You do not usually make payments at this time.",
+    "PAIR_BLOCKED": "A payment to this UPI ID was stopped earlier. It stays stopped for 24 hours.",
+    "USER_BLOCKED": "You put this UPI ID on your never-pay list. Payments to it stay stopped until you take it off."
+  },
+  "sources": {
+    "link": "The link",
+    "qr": "The QR code",
+    "typed": "The name you were given"
+  },
+  "ordinals": [
+    "first",
+    "second",
+    "third",
+    "fourth",
+    "fifth",
+    "sixth"
+  ],
+  "durations": {
+    "minutes": "{n} minutes",
+    "hours": "{n} hours",
+    "day": "1 day",
+    "days": "{n} days",
+    "moments": "moments"
+  },
+  "families": {
+    "DIGITAL_ARREST": {
+      "name": "Digital arrest",
+      "noun": "digital-arrest",
+      "headline": "This looks like a \"digital arrest\" scam",
+      "body": "Police, CBI and courts never ask for money over UPI and never keep you on a call. Hang up. Call 1930.",
+      "tip": "Police, CBI and courts never ask for money over UPI and never keep you on a call. Hang up and call 1930.",
+      "question": "Is someone on a call telling you to make this payment?",
+      "risky_answer": "yes"
+    },
+    "FAKE_REFUND": {
+      "name": "Fake refund",
+      "noun": "refund",
+      "headline": "You are about to PAY money, not receive it",
+      "body": "No one needs your UPI PIN or a payment from you to send you a refund.",
+      "tip": "You never have to pay, scan a code or enter your UPI PIN to receive a refund.",
+      "question": "Were you told this payment is needed to receive a refund?",
+      "risky_answer": "yes"
+    },
+    "MULE_TRANSFER": {
+      "name": "Mule transfer",
+      "noun": "advance-payment",
+      "headline": "This UPI ID is collecting money from many strangers",
+      "body": "It was created recently and many new people have paid it in the last hour.",
+      "tip": "A newly opened personal account that many strangers are suddenly paying is often collecting money for scammers. Pay an advance only to a seller you can check.",
+      "question": "Do you personally know the person you are paying?",
+      "risky_answer": "no",
+      "variants": {
+        "network": {
+          "headline": "This UPI ID looks like a pass-through account",
+          "body": "Accounts like this are opened to collect money and move it on quickly. Pay only if you know this person."
+        }
+      }
+    },
+    "IMPERSONATION": {
+      "name": "Impersonation",
+      "noun": "impersonation",
+      "headline": "Check this request with the person directly",
+      "body": "You have never paid this UPI ID before. Call them on a number you already have.",
+      "tip": "A boss, relative or friend writing from a new number and asking for money urgently: call them on the number you already have before you pay.",
+      "question": "Have you spoken to this person on a number you already had?",
+      "risky_answer": "no",
+      "variants": {
+        "known": {
+          "body": "Call them on a number you already have before you pay."
+        }
+      }
+    },
+    "KYC_BILL_THREAT": {
+      "name": "KYC or bill threat",
+      "noun": "KYC and bill",
+      "headline": "Banks and electricity boards do not take payments this way",
+      "body": "Messages that threaten to block your account or cut your power unless you pay now are a common scam.",
+      "tip": "Banks and electricity boards do not threaten to cut you off unless you pay a personal UPI ID right now.",
+      "question": "Did a message or call threaten to block your account or cut a service?",
+      "risky_answer": "yes"
+    },
+    "INVESTMENT_TASK": {
+      "name": "Investment or task scam",
+      "noun": "investment and task",
+      "headline": "Guaranteed returns are a warning sign",
+      "body": "Scammers pay small amounts first, then ask for larger \"deposits\" you never get back.",
+      "tip": "Guaranteed returns and paid \"tasks\" are bait. Scammers pay small amounts first, then ask for larger deposits you never get back.",
+      "question": "Were you promised a return or reward for making this payment?",
+      "risky_answer": "yes"
+    },
+    "UNCLASSIFIED": {
+      "name": "Unusual payment",
+      "noun": "payment",
+      "headline": "This payment looks unusual",
+      "body": "Take a moment to check who you are paying and why.",
+      "tip": "Take a moment to check who you are paying and why.",
+      "question": "Did someone you have not met in person ask you to make this payment?",
+      "risky_answer": "yes"
+    }
+  },
+  "band_reasons": {
+    "reported": "Reported for fraud",
+    "reports": "Reported by other users",
+    "fan_in": "Many new people have paid this recently",
+    "near_miss": "Several people cancelled payments to this UPI ID",
+    "activity": "Unusual recent activity"
+  },
+  "message": {
+    "advice": {
+      "SCAM": [
+        "Do not reply, click links or call numbers in this message.",
+        "Do not pay anyone it mentions.",
+        "If you already paid, call 1930 now."
+      ],
+      "CAREFUL": [
+        "Check with the organisation using a number from their official website or app.",
+        "Do not share any code or PIN."
+      ],
+      "FINE": [
+        "We did not find signs of a scam. Stay careful with any request for money or codes."
+      ]
+    },
+    "flags": {
+      "urgency": "Pressure to act fast is a common scam tactic.",
+      "authority": "Real authorities do not contact you this way.",
+      "threat": "Threats are used to stop you thinking.",
+      "refund_bait": "You never need to pay to receive money.",
+      "secrets": "No one legitimate asks for your PIN or code.",
+      "secrecy": "Being told to keep it secret is a warning sign.",
+      "investment": "Guaranteed returns do not exist.",
+      "link": "Shortened links hide where they really go."
+    }
+  },
+  "guardian": {
+    "summary_title": "{name} is trying to send ₹{amount}"
+  }
+}

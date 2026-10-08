@@ -1,0 +1,17 @@
+.env
+.venv/
+.cache/
+.data/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+.next/
+.expo/
+dist/
+web-build/
+ml/artifacts/*
+!ml/artifacts/.gitkeep
+*.log
+.DS_Store
+Thumbs.db
